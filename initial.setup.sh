@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -e
+#Treat unset variables as an error
 set -u
 
 TRUE=0
@@ -43,9 +43,7 @@ install_utils () {
 	apt_update
 	apt install -y \
 		vim \
-		byobu \
-		zsh \
-		curl
+		byobu
 }
 
 install_git () {
@@ -97,6 +95,16 @@ install_docker () {
 	sudo docker run hello-world
 }
 
+install_ohmyzsh () {
+	echo "installing zsh and oh-my-zsh"
+	apt_update
+	apt install -y \
+		zsh \
+		curl \
+		git
+	sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+}
+
 confirm "install utils"
 if [ $? = $TRUE ]; then
 	install_utils
@@ -110,4 +118,10 @@ fi
 confirm "install docker"
 if [ $? = $TRUE ]; then
 	install_docker
+fi
+
+
+confirm "install oh-my-zsh"
+if [ $? = $TRUE ]; then
+	install_ohmyzsh
 fi
