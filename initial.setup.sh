@@ -15,15 +15,31 @@ if [ "$EUID" -ne 0 ]
 fi
 
 function confirm () {
-	echo -n ${1}
-	read -p "? (Y/n) " -n 1 -r
-	echo    # (optional) move to a new line
-	if [[ $REPLY =~ ^[Yy]$ ]]
+	QUERY=${1}
+	EXPLANATION=${2}
+	echo -n $QUERY
+	read -p "? (Y/n/?) " -n 1 -r
+	echo    # move to a new line
+	if [[ $REPLY =~ ^[?]$ ]]
+	then
+		echo
+		echo $EXPLANATION
+		echo
+		confirm "$QUERY" "$EXPLANATION"
+		return $?
+	elif [[ $REPLY =~ ^[Yy]$ ]]
 	then
 		# do dangerous stuff
 		return $TRUE
 	else
 		return $FALSE
+	fi
+}
+
+function confirm_and_run () {
+	confirm "$2" "$3"
+	if [ $? = $TRUE ]; then
+		$1
 	fi
 }
 
@@ -105,23 +121,8 @@ install_ohmyzsh () {
 	sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 }
 
-confirm "install utils"
-if [ $? = $TRUE ]; then
-	install_utils
-fi
 
-confirm "install git"
-if [ $? = $TRUE ]; then
-	install_git
-fi
-
-confirm "install docker"
-if [ $? = $TRUE ]; then
-	install_docker
-fi
-
-
-confirm "install oh-my-zsh"
-if [ $? = $TRUE ]; then
-	install_ohmyzsh
-fi
+confirm_and_run install_utils "install utils" "Install various system utils like vim and byobu"
+confirm_and_run install_git "install git" "Install git version control system"
+confirm_and_run install_docker "install docker" "Install docker following the docker CE guide.\nThe official guide asks to remove any debian-repo version of docker."
+confirm_and_run install_ohmyzsh "install oh-my-zsh" "The nicest shell with the most awesome plugins"
