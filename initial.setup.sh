@@ -121,8 +121,16 @@ install_ohmyzsh () {
 	sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 }
 
+install_awscli () {
+	echo "installing python-pip and aws cli"
+	apt_update
+	apt install -y \
+		python-pip
+	pip install awscli
+}
 
 confirm_and_run install_utils "install utils" "Install various system utils like vim and byobu"
 confirm_and_run install_git "install git" "Install git version control system"
 confirm_and_run install_docker "install docker" "Install docker following the docker CE guide.\nThe official guide asks to remove any debian-repo version of docker."
 confirm_and_run install_ohmyzsh "install oh-my-zsh" "The nicest shell with the most awesome plugins"
+confirm_and_run install_awscli "install awscli" "install the Amazon Web Service command line interface along with python-pip"
